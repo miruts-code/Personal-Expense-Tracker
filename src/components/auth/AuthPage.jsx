@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 import "./AuthPage.css";
 function AuthPage() {
   const [mode, setMode] = useState("login");
@@ -9,22 +10,24 @@ function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { signup, login } =useAuth()
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const [submitMessage, setSubmitMessage] = useState("");
-  const [submitMessageType, setSubmitMessageType] = useState("success");
+  const [submitError, setSubmitError] = useState("");
   function clearErrors() {
     setNameError("");
     setEmailError("");
     setPasswordError("");
     setConfirmPasswordError("");
+    setSubmitError('')
   }
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
+   
   function handleSubmit() {
     clearErrors();
     let haserror = false;
@@ -48,8 +51,11 @@ function AuthPage() {
       setConfirmPasswordError("Passwords do not match");
       haserror = true;
     }
-      if (haserror) return;
-
+    if (haserror) return;
+    const result = mode === 'signup' ? signup(name, email, password) : login(email, password);
+    if (!result.success) {
+      setSubmitError(result.message)
+    }
   }
   function switchMode(newmode) {
     setMode(newmode);
@@ -177,9 +183,9 @@ function AuthPage() {
         <button className="auth-submit-btn" type="submit">
           {mode === "login" ? "Login" : "create account"}
         </button>
-        {submitMessage && (
-          <p className={`submit-message ${submitMessageType}`}>
-            {submitMessage}
+        {submitError && (
+          <p className='error-message'>
+            {submitError}
           </p>
         )}
       </form>
