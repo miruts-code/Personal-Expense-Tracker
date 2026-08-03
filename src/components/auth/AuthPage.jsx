@@ -1,47 +1,189 @@
 import { useState } from "react";
-import './AuthPage.css';
+import { Eye, EyeOff } from "lucide-react";
+import "./AuthPage.css";
 function AuthPage() {
-    const [mode, setMode] = useState("login");
-    function handleSubmit() {
-        
+  const [mode, setMode] = useState("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitMessageType, setSubmitMessageType] = useState("success");
+  function clearErrors() {
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+  }
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function handleSubmit() {
+    clearErrors();
+    let haserror = false;
+
+    if (mode === "signup" && name.trim() === "") {
+      setNameError("Name is required");
+      haserror = true;
     }
-    return (
-        <div className="auth-container">
-                <h1 className="auth-title">Welcome to Personal Expense Tracker</h1>
-                <form  classname='auth-form' onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                }}>
-                <div className="auth-toggle">
-                        <button className={mode === "login" ? 'active' : ''}
-                            type="button"
-                        onClick={() => setMode("login")}>Login</button>
-                        <button className={mode === "signup" ? 'active' : ''}
-                            type="button"
-                        onClick={() => setMode("signup")}>Sign Up</button>
-                </div>
-                {mode === 'signup' && (
-                    <>
-                            <label className='form-label' htmlFor="name">Name</label>
-                            <input className='form-input' type="text" id="name"  />       
-                    </>
-                )
-                    }
-                    <label className='form-label' htmlFor="email">Email</label>
-                    <input className='form-input' type="email" id="email" />
-                    
-                    <label className='form-label' htmlFor="password">Password</label>
-                    <input className='form-input' type="password" id="password" />
-                    {mode === 'signup' && (
-                        <>
-                            <label className='form-label' htmlFor="confirmPassword">Confirm Password</label>
-                            <input className='form-input' type="password" id="confirmPassword" />
-                        </>
-                    )}
-                    
-                    <button className='auth-submit-btn' type="submit">{mode === "login" ? "Login" : "create account"}</button>
-                    </form>
+    if (!email.trim() || !isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      haserror = true;
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+      haserror = true;
+    } else if (mode === "signup" && password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      haserror = true;
+    }
+    if (mode === "signup" && password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      haserror = true;
+    }
+      if (haserror) return;
+
+  }
+  function switchMode(newmode) {
+    setMode(newmode);
+    clearErrors();
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  }
+  return (
+    <div className="auth-container">
+      <h1 className="auth-title">Welcome to Personal Expense Tracker</h1>
+      <form
+         className="auth-form"
+          noValidate    
+         onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <div className="auth-toggle">
+          <button
+            className={mode === "login" ? "active" : ""}
+            type="button"
+            onClick={() => (mode !== "login" ? switchMode("login") : "")}
+          >
+            Login
+          </button>
+          <button
+            className={mode === "signup" ? "active" : ""}
+            type="button"
+            onClick={() => (mode !== "signup" ? switchMode("signup") : "")}
+          >
+            Sign Up
+          </button>
+        </div>
+        {mode === "signup" && (
+          <>
+            <label className="form-label" htmlFor="name">
+              Name
+            </label>
+            <input
+              className={`form-input ${nameError ? "error" : ""}`}
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameError("");
+              }}
+              type="text"
+              id="name"
+              placeholder="e.g. Miruts"
+            />
+            {nameError && <div className="error-message">{nameError}</div>}
+          </>
+        )}
+        <label className="form-label" htmlFor="email">
+          Email
+        </label>
+        <input
+          className={`form-input ${emailError ? "error" : ""}`}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError("");
+          }}
+          type="email"
+          id="email"
+          placeholder="e.g. miruts@example.com"
+        />
+        {emailError && <p className="error-message">{emailError}</p>}
+
+        <label className="form-label" htmlFor="password">
+          Password
+        </label>
+        <div className="password-input-wrapper">
+          <input
+            className={`form-input ${passwordError ? "error" : ""}`}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError("");
+            }}
+            type={showPassword ? "text" : "password"}
+            id="password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="password-toggle-btn"
+          >
+            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+          </button>
+        </div>
+        {passwordError && <p className="error-message">{passwordError}</p>}
+        {mode === "signup" && (
+          <>
+            <label className="form-label" htmlFor="confirmPassword">
+              Confirm Password
+            </label>
+            <div className="password-input-wrapper">
+              <input
+                className={`form-input ${confirmPasswordError ? "error" : ""}`}
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setConfirmPasswordError("");
+                }}
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="password-toggle-btn"
+              >
+                {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+              </button>
             </div>
-    )
+            {confirmPasswordError && (
+              <p className="error-message">{confirmPasswordError}</p>
+            )}
+          </>
+        )}
+
+        <button className="auth-submit-btn" type="submit">
+          {mode === "login" ? "Login" : "create account"}
+        </button>
+        {submitMessage && (
+          <p className={`submit-message ${submitMessageType}`}>
+            {submitMessage}
+          </p>
+        )}
+      </form>
+    </div>
+  );
 }
 export default AuthPage;
