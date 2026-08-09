@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useMemo } from "react";
-import { transactionReducer, initialState } from "./transactionReducer";
+import transactionReducer,{ initialState } from "./transactionReducer";
 import { useAuth } from "./AuthContext";
 
 const TransactionContext = createContext();
