@@ -4,29 +4,39 @@ import { useAuth } from "./AuthContext";
 
 const TransactionContext = createContext();
 
-function TransactionProvider({ children }) {
+export function TransactionProvider({ children }) {
   const { currentUser } = useAuth();
   const [state, dispatch] = useReducer(transactionReducer, initialState);
 
-  const storageKey = currentUser ? `transactions_${currentUser.id}` : null;
+  const txKey = currentUser ? `transactions_${currentUser.id}` : null;
+  const catKey = currentUser ? `categories_${currentUser.id}` : null;
 
-  // Load transactions when the logged-in user changes
   useEffect(() => {
-    if (!storageKey) return;
-    const stored = localStorage.getItem(storageKey);
-    dispatch({ type: "LOAD_TRANSACTIONS", payload: stored ? JSON.parse(stored) : [] });
-  }, [storageKey]);
+    if (!txKey || !catKey) return;
+    const storedTx = localStorage.getItem(txKey);
+    const storedCat = localStorage.getItem(catKey);
+    dispatch({ type: "LOAD_TRANSACTIONS", payload: storedTx ? JSON.parse(storedTx) : [] });
+    dispatch({
+      type: "LOAD_CATEGORIES",
+      payload: storedCat ? JSON.parse(storedCat) : initialState.categories,
+    });
+  }, [txKey, catKey]);
 
-  // Persist on every change
   useEffect(() => {
-    if (!storageKey) return;
-    localStorage.setItem(storageKey, JSON.stringify(state.transactions));
-  }, [state.transactions, storageKey]);
+    if (!txKey) return;
+    localStorage.setItem(txKey, JSON.stringify(state.transactions));
+  }, [state.transactions, txKey]);
+
+  useEffect(() => {
+    if (!catKey) return;
+    localStorage.setItem(catKey, JSON.stringify(state.categories));
+  }, [state.categories, catKey]);
 
   const addTransaction = (data) => dispatch({ type: "ADD_TRANSACTION", payload: data });
   const editTransaction = (id, data) => dispatch({ type: "EDIT_TRANSACTION", payload: { id, data } });
   const deleteTransaction = (id) => dispatch({ type: "DELETE_TRANSACTION", payload: id });
   const setEditingId = (id) => dispatch({ type: "SET_EDITING_ID", payload: id });
+  const addCategory = (name) => dispatch({ type: "ADD_CATEGORY", payload: name });
 
   const totals = useMemo(() => {
     return state.transactions.reduce(
@@ -51,11 +61,13 @@ function TransactionProvider({ children }) {
 
   const value = {
     transactions: state.transactions,
+    categories: state.categories,
     editingId: state.editingId,
     addTransaction,
     editTransaction,
     deleteTransaction,
     setEditingId,
+    addCategory,
     totals,
     categoryTotals,
   };
@@ -67,8 +79,6 @@ function TransactionProvider({ children }) {
   );
 }
 
-function useTransactions() {
+export function useTransactions() {
   return useContext(TransactionContext);
 }
-export { useTransactions };
-export default TransactionProvider;
