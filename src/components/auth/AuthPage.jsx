@@ -2,15 +2,15 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import "./AuthPage.css";
-function AuthPage() {
-  const [mode, setMode] = useState("login");
+function AuthPage({ initialMode = "login", onBack }) {
+  const [mode, setMode] = useState(initialMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { signup, login } =useAuth()
+  const { signup, login } = useAuth();
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -67,7 +67,11 @@ function AuthPage() {
   }
   return (
     <div className="auth-container">
-      <h1 className="auth-title">Welcome to Personal Expense Tracker</h1>
+      {onBack && (
+        <button type="button" className="auth-back-btn" onClick={onBack}>
+          ← Back
+        </button>
+      )}
       <form
          className="auth-form"
           noValidate    
@@ -76,22 +80,6 @@ function AuthPage() {
           handleSubmit();
         }}
       >
-        <div className="auth-toggle">
-          <button
-            className={mode === "login" ? "active" : ""}
-            type="button"
-            onClick={() => (mode !== "login" ? switchMode("login") : "")}
-          >
-            Login
-          </button>
-          <button
-            className={mode === "signup" ? "active" : ""}
-            type="button"
-            onClick={() => (mode !== "signup" ? switchMode("signup") : "")}
-          >
-            Sign Up
-          </button>
-        </div>
         {mode === "signup" && (
           <>
             <label className="form-label" htmlFor="name">

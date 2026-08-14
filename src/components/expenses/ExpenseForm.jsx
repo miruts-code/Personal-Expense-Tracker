@@ -1,39 +1,66 @@
-import { useState } from "react";
-import { useTransactions } from "../../contexts/TransactionContext";
-import "./TransactionForm.css";
+import { useEffect, useState } from "react";
+import { useExpenses } from "../../contexts/ExpenseContext";
+import "./ExpenseForm.css";
 
-function TransactionForm() {
+function ExpenseForm() {
   const {
-    addTransaction,
+    addExpense,
     editingId,
-    transactions,
-    editTransaction,
+    expenses,
+    editExpense,
     setEditingId,
     categories,
     addCategory,
-  } = useTransactions();
+    budgets,
+  } = useExpenses();
 
-  const editingTransaction = transactions.find((t) => t.id === editingId);
+  const editingExpense = expenses.find((expense) => expense.id === editingId);
 
-  const [type, setType] = useState(editingTransaction?.type || "expense");
-  const [amount, setAmount] = useState(editingTransaction?.amount ?? "");
-  const [category, setCategory] = useState(editingTransaction?.category || categories[0]);
+  const [type, setType] = useState("expense");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState(categories[0] || "");
   const [isOther, setIsOther] = useState(false);
   const [customCategory, setCustomCategory] = useState("");
-  const [description, setDescription] = useState(editingTransaction?.description || "");
-  const [date, setDate] = useState(editingTransaction?.date || "");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const populateForm = (expense) => {
+    if (!expense) {
+      resetForm();
+      return;
+    }
+
+    setType("expense");
+    setAmount(String(expense.amount ?? ""));
+    setCategory(expense.category && categories.includes(expense.category) ? expense.category : "");
+    setIsOther(!(expense.category && categories.includes(expense.category)));
+    setCustomCategory(expense.category && !categories.includes(expense.category) ? expense.category : "");
+    setDescription(expense.description || "");
+    setDate(expense.date || "");
+  };
 
   function resetForm() {
     setType("expense");
     setAmount("");
-    setCategory(categories[0]);
+    setCategory(categories[0] || "");
     setIsOther(false);
     setCustomCategory("");
     setDescription("");
     setDate("");
   }
+
+  useEffect(() => {
+    if (editingId && editingExpense) {
+      populateForm(editingExpense);
+      return;
+    }
+
+    if (!editingId) {
+      resetForm();
+    }
+  }, [editingId, editingExpense, categories]);
 
   function handleCategoryChange(e) {
     const value = e.target.value;
@@ -71,14 +98,47 @@ function TransactionForm() {
       finalCategory = trimmed;
     }
 
-    const data = { type, amount: numericAmount, category: finalCategory, description, date };
+    const data = { type: "expense", amount: numericAmount, category: finalCategory, description, date };
+
+    const rawBudgetLimit = budgets[finalCategory];
+    const budgetLimit = Number(rawBudgetLimit);
+    if (Number.isFinite(budgetLimit) && budgetLimit > 0) {
+      const txDate = new Date(date);
+      const txMonth = txDate.getMonth();
+      const txYear = txDate.getFullYear();
+
+      const spentSoFar = expenses
+        .filter(
+          (expense) =>
+            expense.type === "expense" &&
+            expense.category === finalCategory &&
+            expense.id !== editingId
+        )
+        .filter((expense) => {
+          const d = new Date(expense.date);
+          return d.getMonth() === txMonth && d.getFullYear() === txYear;
+        })
+        .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+
+      const projectedTotal = spentSoFar + numericAmount;
+
+      if (projectedTotal > budgetLimit) {
+        const remaining = budgetLimit - spentSoFar;
+        setError(
+          remaining > 0
+            ? `Not enough budget. Only $${remaining.toFixed(2)} remaining in ${finalCategory}.`
+            : `Not enough budget. ${finalCategory} has already reached its limit.`
+        );
+        return;
+      }
+    }
 
     if (editingId) {
-      editTransaction(editingId, data);
-      setSuccessMessage("Transaction updated.");
+      editExpense(editingId, data);
+      setSuccessMessage("Expense updated.");
     } else {
-      addTransaction(data);
-      setSuccessMessage("Transaction added.");
+      addExpense(data);
+      setSuccessMessage("Expense added.");
     }
 
     resetForm();
@@ -87,25 +147,8 @@ function TransactionForm() {
   }
 
   return (
-    <form className="transaction-form" onSubmit={handleSubmit}>
-      <h2 className="form-title">{editingId ? "Edit Transaction" : "Add Transaction"}</h2>
-
-      <div className="type-toggle">
-        <button
-          type="button"
-          className={type === "expense" ? "active" : ""}
-          onClick={() => setType("expense")}
-        >
-          Expense
-        </button>
-        <button
-          type="button"
-          className={type === "income" ? "active" : ""}
-          onClick={() => setType("income")}
-        >
-          Income
-        </button>
-      </div>
+    <form className="expense-form" onSubmit={handleSubmit}>
+      <h2 className="form-title">{editingId ? "Edit Expense" : "Add Expense"}</h2>
 
       <label className="field-label">Amount</label>
       <input
@@ -162,10 +205,10 @@ function TransactionForm() {
       {successMessage && <p className="form-success">{successMessage}</p>}
 
       <button type="submit" className="submit-btn">
-        {editingId ? "Save Changes" : "Add Transaction"}
+        {editingId ? "Save Changes" : "Add Expense"}
       </button>
     </form>
   );
 }
 
-export default TransactionForm;
+export default ExpenseForm;

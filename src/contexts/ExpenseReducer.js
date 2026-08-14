@@ -1,14 +1,14 @@
 export const initialState = {
-  transactions: [],
+  expenses: [],
   editingId: null,
   categories: ["Food", "Transportation", "Housing", "Clothes", "Entertainment"],
   budgets: {},
 };
 
- function transactionReducer(state, action) {
+function expenseReducer(state, action) {
   switch (action.type) {
-    case "LOAD_TRANSACTIONS":
-      return { ...state, transactions: action.payload };
+    case "LOAD_EXPENSES":
+      return { ...state, expenses: action.payload };
 
     case "LOAD_CATEGORIES":
       return { ...state, categories: action.payload };
@@ -33,30 +33,31 @@ export const initialState = {
       return { ...state, categories: [...state.categories, trimmed] };
     }
 
-    case "ADD_TRANSACTION": {
-      const newTransaction = {
+    case "ADD_EXPENSE": {
+      const newExpense = {
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         ...action.payload,
+        type: "expense",
       };
-      return { ...state, transactions: [...state.transactions, newTransaction] };
+      return { ...state, expenses: [...state.expenses, newExpense] };
     }
 
-    case "EDIT_TRANSACTION": {
+    case "EDIT_EXPENSE": {
       const { id, data } = action.payload;
       return {
         ...state,
-        transactions: state.transactions.map((t) =>
-          t.id === id ? { ...t, ...data } : t
+        expenses: state.expenses.map((expense) =>
+          expense.id === id ? { ...expense, ...data, type: "expense" } : expense
         ),
         editingId: null,
       };
     }
 
-    case "DELETE_TRANSACTION":
+    case "DELETE_EXPENSE":
       return {
         ...state,
-        transactions: state.transactions.filter((t) => t.id !== action.payload),
+        expenses: state.expenses.filter((expense) => expense.id !== action.payload),
       };
 
     case "SET_EDITING_ID":
@@ -66,4 +67,4 @@ export const initialState = {
       return state;
   }
 }
-export default transactionReducer;
+export default expenseReducer;

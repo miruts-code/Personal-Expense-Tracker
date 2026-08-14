@@ -1,0 +1,154 @@
+.history-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+}
+
+.filter-field label {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.filter-field select,
+.filter-field input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.clear-filters-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  height: 36px;
+}
+
+.clear-filters-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.history-summary {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.income-total {
+  color: var(--income);
+  font-weight: 600;
+}
+
+.expense-total {
+  color: var(--expense);
+  font-weight: 600;
+}
+
+.history-empty {
+  color: var(--text);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.history-group {
+  margin-bottom: 24px;
+}
+
+.history-group-title {
+  font-family: var(--heading);
+  font-size: 15px;
+  color: var(--text-h);
+  margin-bottom: 10px;
+}
+
+.history-table {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 6px 18px;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 130px 90px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-date {
+  color: var(--text);
+}
+
+.history-desc {
+  color: var(--text-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-category {
+  color: var(--text);
+}
+
+.history-amount {
+  text-align: right;
+  font-weight: 600;
+}
+
+.history-amount.income {
+  color: var(--income);
+}
+
+.history-amount.expense {
+  color: var(--expense);
+}
+
+@media (max-width: 640px) {
+  .history-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "date amount"
+      "desc desc"
+      "category category";
+    row-gap: 4px;
+  }
+  .history-date { grid-area: date; }
+  .history-amount { grid-area: amount; }
+  .history-desc { grid-area: desc; }
+  .history-category { grid-area: category; font-size: 12px; }
+}

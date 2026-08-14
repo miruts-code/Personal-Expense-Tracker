@@ -1,0 +1,75 @@
+.expenses-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-family: var(--heading);
+  font-size: 26px;
+  color: var(--text-h);
+  margin-bottom: 20px;
+}
+
+.expenses-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.expenses-list-section {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+
+.expenses-list-section h2 {
+  font-family: var(--heading);
+  font-size: 16px;
+  color: var(--text-h);
+  margin-bottom: 12px;
+}
+
+.category-breakdown {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.category-bar-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 70px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.category-name {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.category-bar-track {
+  background: #2a2a2a;
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.category-bar-fill {
+  background: var(--accent);
+  height: 100%;
+  border-radius: 6px;
+}
+
+.category-amount {
+  font-size: 13px;
+  color: var(--text-h);
+  text-align: right;
+}
+
+@media (max-width: 800px) {
+  .expenses-layout {
+    grid-template-columns: 1fr;
+  }
+}
