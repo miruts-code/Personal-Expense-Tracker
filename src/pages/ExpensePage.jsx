@@ -1,7 +1,7 @@
 import { useExpenses } from "../contexts/ExpenseContext";
 import ExpenseForm from "../components/expenses/ExpenseForm";
 import ExpenseList from "../components/expenses/ExpenseList";
-import "./ExpensesPage.css";
+import "./ExpensePage.css";
 
 function ExpensesPage() {
   const { expenses, deleteExpense, setEditingId, categoryTotals } = useExpenses();

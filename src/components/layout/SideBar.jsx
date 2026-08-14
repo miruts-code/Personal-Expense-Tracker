@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   Menu,
   Home,
-  ArrowLeftRight,
+  Receipt,
   History,
   PiggyBank,
   LogOut,
@@ -12,7 +12,7 @@ import "./Sidebar.css";
 
 const NAV_ITEMS = [
   { to: "/", label: "Home", icon: Home, end: true },
-  { to: "/transactions", label: "Transactions", icon: ArrowLeftRight },
+  { to: "/expenses", label: "Expenses", icon: Receipt },
   { to: "/history", label: "History", icon: History },
   { to: "/budgets", label: "Budgets", icon: PiggyBank },
 ];

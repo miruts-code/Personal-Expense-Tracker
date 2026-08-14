@@ -6,7 +6,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { ExpenseProvider } from "./contexts/ExpenseContext.jsx";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
-import ExpensesPage from "./pages/ExpensesPage";
+import ExpensesPage from "./pages/ExpensePage";
 import HistoryPage from "./pages/HistoryPage";
 import BudgetsPage from "./pages/BudgetsPage";
 

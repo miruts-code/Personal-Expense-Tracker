@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useMemo } from "react";
-import expenseReducer,{ initialState } from "./ExpenseReducer";
+import expenseReducer, { initialState } from "./ExpenseReducer";
 import { useAuth } from "./AuthContext";
 
 const ExpenseContext = createContext();
@@ -54,8 +54,48 @@ export function ExpenseProvider({ children }) {
     localStorage.setItem(budgetKey, JSON.stringify(state.budgets));
   }, [state.budgets, budgetKey]);
 
-  const addExpense = (data) => dispatch({ type: "ADD_EXPENSE", payload: data });
-  const editExpense = (id, data) => dispatch({ type: "EDIT_EXPENSE", payload: { id, data } });
+  const addExpense = (data) => {
+    // Calculate current balance
+    const expenses = state.expenses
+      .filter((expense) => expense.type === "expense")
+      .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+    const budget = Object.values(state.budgets).reduce((sum, value) => sum + Number(value || 0), 0);
+    const currentBalance = budget - expenses;
+
+    // Validate: only allow expense if amount doesn't exceed current balance
+    if (data.type === "expense" && Number(data.amount) > currentBalance) {
+      throw new Error(
+        `Insufficient balance. Your current balance is $${currentBalance.toFixed(2)}. Cannot add expense of $${Number(data.amount).toFixed(2)}.`
+      );
+    }
+
+    dispatch({ type: "ADD_EXPENSE", payload: data });
+  };
+
+  const editExpense = (id, data) => {
+    // For edits, calculate the difference in amount
+    const oldExpense = state.expenses.find((e) => e.id === id);
+    if (!oldExpense) throw new Error("Expense not found");
+
+    const amountDifference = Number(data.amount) - Number(oldExpense.amount);
+
+    if (data.type === "expense" && amountDifference > 0) {
+      const expenses = state.expenses
+        .filter((expense) => expense.type === "expense")
+        .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+      const budget = Object.values(state.budgets).reduce((sum, value) => sum + Number(value || 0), 0);
+      const currentBalance = budget - expenses;
+
+      if (amountDifference > currentBalance) {
+        throw new Error(
+          `Insufficient balance for this increase. Your current balance is $${currentBalance.toFixed(2)}.`
+        );
+      }
+    }
+
+    dispatch({ type: "EDIT_EXPENSE", payload: { id, data } });
+  };
+
   const deleteExpense = (id) => dispatch({ type: "DELETE_EXPENSE", payload: id });
   const setEditingId = (id) => dispatch({ type: "SET_EDITING_ID", payload: id });
   const addCategory = (name) => dispatch({ type: "ADD_CATEGORY", payload: name });
