@@ -1,30 +1,38 @@
-import Authpage from "./components/auth/Authpage";
-import {useAuth} from "./contexts/AuthContext";
-import TransactionForm from "./components/transactions/TransactionForm";
-import Dashboard from "./components/dashboard/Dashboard";
-import { TransactionProvider } from './contexts/TransactionContext.jsx'
-function App() {
-  const {currentUser, logout} = useAuth();
-  return (
-    <div className="app-container">
-     {!currentUser&& <Authpage />} 
-     {currentUser &&(
-      <TransactionProvider>
-      <div>
-          <div style={{ padding: "16px", display: "flex", justifyContent: "space-between" }}>
-            <p>Welcome,  {currentUser.name || currentUser.email}</p>
-            <button onClick={logout}>Log Out</button>
-          </div>
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AuthPage from "./components/auth/AuthPage";
+import { useAuth } from "./contexts/AuthContext";
+import { TransactionProvider } from "./contexts/TransactionContext.jsx";
+import AppLayout from "./components/layout/AppLayout";
+import HomePage from "./pages/HomePage";
+import TransactionsPage from "./pages/TransactionsPage";
+import HistoryPage from "./pages/HistoryPage";
+import BudgetsPage from "./pages/BudgetsPage";
 
-          <Dashboard />
-          <div style={{ marginTop: "40px" }}>
-            <TransactionForm />
-          </div>
-        </div>
-      </TransactionProvider>)}
-    </div>
-     
-    
+function App() {
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return (
+      <div className="app-container">
+        <AuthPage />
+      </div>
+    );
+  }
+
+  return (
+    <TransactionProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/budgets" element={<BudgetsPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </TransactionProvider>
   );
 }
+
 export default App;

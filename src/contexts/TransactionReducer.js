@@ -2,6 +2,7 @@ export const initialState = {
   transactions: [],
   editingId: null,
   categories: ["Food", "Transportation", "Housing", "Clothes", "Entertainment"],
+  budgets: {},
 };
 
  function transactionReducer(state, action) {
@@ -11,6 +12,20 @@ export const initialState = {
 
     case "LOAD_CATEGORIES":
       return { ...state, categories: action.payload };
+
+    case "LOAD_BUDGETS":
+      return { ...state, budgets: action.payload };
+
+    case "SET_BUDGET": {
+      const { category, amount } = action.payload;
+      return { ...state, budgets: { ...state.budgets, [category]: amount } };
+    }
+
+    case "DELETE_BUDGET": {
+      const rest = { ...state.budgets };
+      delete rest[action.payload];
+      return { ...state, budgets: rest };
+    }
 
     case "ADD_CATEGORY": {
       const trimmed = action.payload.trim();
