@@ -20,6 +20,7 @@ function App() {
   }
 
   return (
+    <div className="app-container">
     <TransactionProvider>
       <BrowserRouter>
         <Routes>
@@ -32,7 +33,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </TransactionProvider>
-  );
+    </div>);
 }
 
 export default App;
